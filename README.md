@@ -147,7 +147,7 @@ openclaw cron edit <job-id> --disabled
 ## 依赖
 
 - Python 3（标准库即可，无需 pip install）
-- OpenClaw 2026.3.x+
+- **OpenClaw 2026.3.24**（已验证兼容）
 - `openclaw` CLI 在 PATH 中
 
 ## 兼容性
@@ -156,3 +156,16 @@ openclaw cron edit <job-id> --disabled
 - 不同模型（自动读取 contextWindow）
 - 不同平台（macOS / Linux / Windows with WSL）
 - 不同会话模式（legacy 小窗口 / 大窗口 1M+）
+
+### 与 OpenClaw 原生功能的关系
+
+| OpenClaw 原生 | 本技能 | 关系 |
+|--------------|--------|------|
+| **Session Pruning** | — | ✅ 互补。Pruning 裁剪旧工具结果（per-request），本技能管理会话级生命周期 |
+| **Auto Compaction** | — | ✅ 互补。Compaction 总结旧消息留在原会话，本技能退休旧会话 + 生成续跑提示 |
+| **`/compact`** | — | ✅ 互补。手动压缩当前会话，不换会话 |
+| **`/new` `/reset`** | — | ✅ 互补。`/new` 丢弃上下文开新会话，本技能保留续跑路径跨会话 |
+| **Cron Jobs** | Watchdog | ✅ 直接使用。本技能用 OpenClaw 内置 cron 部署定时巡检 |
+| **上下文阈值管理** | Rollover | ✅ 补缺。OpenClaw 无原生 rollover / session handoff 机制 |
+
+**结论：完全兼容，无冲突。** 本技能填补的是 OpenClaw 缺少的"会话级 rollover + 续跑提示 + 自动退休标记"能力，与原生 compaction / pruning 各管各的层面。
