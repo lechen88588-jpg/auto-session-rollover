@@ -3,6 +3,8 @@
 Auto Session Rollover — 公共模块
 提供：配置读取、阈值计算、会话 token 读取
 被 watchdog.py 和 rollover.py 共同引用
+
+用户可通过 config.json 自定义 contextWindow（见 README.md）
 """
 
 import json, subprocess, sys
@@ -13,13 +15,32 @@ WORKSPACE = Path.home() / '.openclaw/workspace'
 CONFIG = Path.home() / '.openclaw/openclaw.json'
 HOT = WORKSPACE / 'memory/hot/HOT_MEMORY.md'
 STATE_FILE = WORKSPACE / 'memory/hot/watchdog-state.json'
+SKILL_DIR = Path(__file__).resolve().parent.parent  # auto-session-rollover/
+USER_CONFIG = SKILL_DIR / 'config.json'
 MAIN_SESSION_KEY = 'agent:main:main'
 
 
+def read_user_config():
+    """读取用户自定义配置（技能目录下的 config.json）"""
+    if not USER_CONFIG.exists():
+        return {}
+    try:
+        return json.loads(USER_CONFIG.read_text())
+    except Exception:
+        return {}
+
+
 def read_model_config():
-    """从 openclaw.json 读取主模型名称和 contextWindow"""
+    """从 openclaw.json 读取主模型名称和 contextWindow
+    优先使用用户在 config.json 中的 override 设置
+    """
+    user_cfg = read_user_config()
+    override_k = user_cfg.get('contextWindowK')
+
     model_name = 'unknown'
     max_ctx_k = 200
+
+    # 1. 尝试从 openclaw.json 读取模型官方值
     try:
         cfg = json.loads(CONFIG.read_text())
         primary = cfg.get('agents', {}).get('defaults', {}).get('model', {}).get('primary', '')
@@ -34,6 +55,15 @@ def read_model_config():
                     break
     except Exception as e:
         print(f"WARN: config read error: {e}", file=sys.stderr)
+
+    # 2. 用户 override（如果设置且 ≤ 模型官方值）
+    if override_k is not None:
+        override_k = int(override_k)
+        if override_k <= max_ctx_k:
+            max_ctx_k = override_k
+        else:
+            print(f"WARN: contextWindowK ({override_k}k) exceeds model max ({max_ctx_k}k), using model max", file=sys.stderr)
+
     return model_name, max_ctx_k
 
 
