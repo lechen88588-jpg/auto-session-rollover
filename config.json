@@ -1,1 +1,21 @@
-{"contextWindowK": null, "_comment": "Auto Session Rollover \u7528\u6237\u914d\u7f6e"}
+{
+  "_comment": "Auto Session Rollover 用户配置",
+  "contextWindowK": 200,
+
+  "_contextWindowK_doc": [
+    "设置你希望使用的上下文窗口大小（单位 k，即千 token）",
+    "",
+    "null = 跟随模型官方值（从 openclaw.json 读取）",
+    "200  = 锁定 200k（推荐，省钱，适合大多数场景）",
+    "400  = 锁定 400k（GPT-5.3 Codex 官方 400k）",
+    "1048 = 锁定 1M（MiMo v2 Pro 官方 1M）",
+    "",
+    "超 200k 后各模型加价幅度（以 800k 输入+50k 输出为例）：",
+    "  Claude Opus 4.6: $9.88（最贵）",
+    "  Claude Sonnet 4.6: $5.93",
+    "  GPT-5.4: $5.13（阈值 272k）",
+    "  MiMo v2 Pro: $1.90（最便宜，仅 Opus 的 1/5）",
+    "",
+    "建议：日常 200k，超长文档时临时调大，用完改回。"
+  ]
+}
