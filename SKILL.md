@@ -18,7 +18,7 @@ cron (每10min) → watchdog.py → healthy? → 跳过
 | 文件 | 作用 |
 |------|------|
 | `scripts/ctx_common.py` | 公共模块：配置读取、阈值计算、token 读取 |
-| `scripts/context-watchdog.py` | 巡检脚本：输出 JSON 状态 + 退出码 |
+| `scripts/watchdog.py` | 巡检脚本：输出 JSON 状态 + 退出码 |
 | `rollover.py` | 收口脚本：清理日志、写 HOT_MEMORY、生成续跑提示、追加退休标记 |
 | Cron `ctx-watchdog` | 每 10 分钟调用 watchdog，isolated session |
 

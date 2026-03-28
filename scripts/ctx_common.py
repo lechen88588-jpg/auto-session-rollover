@@ -7,12 +7,12 @@ Auto Session Rollover — 公共模块
 用户可通过 config.json 自定义 contextWindow（见 README.md）
 """
 
-import json, subprocess, sys
+import json, os, subprocess, sys
 from pathlib import Path
 
-# ── 路径（标准 OpenClaw 目录结构）──
-WORKSPACE = Path.home() / '.openclaw/workspace'
-CONFIG = Path.home() / '.openclaw/openclaw.json'
+# ── 路径（标准 OpenClaw 目录结构，可被环境变量覆盖）──
+WORKSPACE = Path(os.environ.get('OPENCLAW_WORKSPACE', str(Path.home() / '.openclaw/workspace'))).expanduser()
+CONFIG = Path(os.environ.get('OPENCLAW_CONFIG', str(Path.home() / '.openclaw/openclaw.json'))).expanduser()
 HOT = WORKSPACE / 'memory/hot/HOT_MEMORY.md'
 STATE_FILE = WORKSPACE / 'memory/hot/watchdog-state.json'
 SKILL_DIR = Path(__file__).resolve().parent.parent  # auto-session-rollover/
